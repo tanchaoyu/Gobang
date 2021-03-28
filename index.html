@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="keywords" content="Gobang,五子棋">
+    <title>Gobang</title>
+    <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/main.css">
+    <script src="./js/ChessEvent.js" type="module"></script>
+    <script src="./js/drawEvent.js" type="module"></script>
+    <script src="./js/test.js" type="module"></script>
+</head>
+<body class="body">
+    <div class="container">
+        <div class="sidebox" id="infobox"><div>当前黑方落子</div></div>
+        <div class="boardcontain">
+            <canvas id="boardbackground" width="640px" height="640px"></canvas>
+            <canvas id="board" width="640px" height="640px"></canvas>
+            <div class="domboard" id="domboard"></div>
+        </div>
+        <div class="toolbar" id="toolbar">
+            <div class="toolbtn" id="withdraw">悔棋</div>
+            <div class="toolbtn" id="unwithdraw">取消悔棋</div>
+            <div class="toolbtn" id="save">保存游戏</div>
+            <div class="toolbtn" id="continue">继续游戏</div>
+            <div class="toolbtn" id="reload">重新开始</div>
+            <div class="toolbtn" id= "canvas">canvas模式</div>
+            <div class="toolbtn" id="dom">DOM模式</div>
+        </div>
+    </div>
+    <div class="backgroundimg"></div>
+</body>
+</html>

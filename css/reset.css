@@ -1,0 +1,45 @@
+body,div,dl,dt,dd,ul,li,h1,h2,h3,h4,h5,h6,input,form,a,p,textarea{
+    margin: 0;
+    padding: 0;
+}
+
+body{
+    min-width: 1240px;
+}
+
+body, button, input, select, textarea, th{
+    color: #000;
+    font-size: 14px;
+    line-height: 1.5;
+    font-family: Tahoma,Arial,\5FAE\8F6F\96C5\9ED1,sans-serif;
+}
+
+ol,ul,li{
+    list-style: none;
+}
+
+a{
+    text-decoration: none;
+    display: block;
+    cursor: pointer;
+    color: #000;
+}
+
+img{
+    border: none;
+    display: block;
+}
+button{
+    cursor: pointer;
+}
+::-webkit-scrollbar{
+    width: 10px;
+    height: 10px;
+}
+::-webkit-scrollbar-thumb{
+    background-color: #ccc;
+    border-radius: 5px;
+}
+::-webkit-scrollbar-track{
+    background: 0 0;
+}
