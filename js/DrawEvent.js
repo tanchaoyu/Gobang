@@ -11,8 +11,8 @@ class DrawEvent {
     this.rectNum = 15;
     //DOM版棋面
     this.DOMBoard = DOMBoard;
-    //切换模式时渲染的进度
-    this.modelParseIn = 0;
+    //切换前的步栈
+    this.oldstepStack = [];
     //左边消息栏
     this.infobox = infobox;
   }
@@ -41,7 +41,7 @@ class DrawEvent {
     while (this.DOMBoard.firstChild) {
       this.DOMBoard.removeChild(this.DOMBoard.firstChild);
     }
-    this.modelParseIn = 0;
+    this.oldstepStack = [];
     this.canvasContent.clearRect(0, 0, 640, 640);
     this.showInfo({ type: "draw", steper: 2 });
   }
@@ -117,51 +117,63 @@ class DrawEvent {
     this.DOMBoard.removeChild(lastchessman);
     this.showInfo(step);
   }
-  //模式切换，思路多还少补，以modalParseIn为基准，DOM补充渲染时创建fragment，避免多次appendChild
+  /*模式切换，思路:判断oldstepStack和stepStack的第一个差异位置，消除差异位之后渲染的内容，补充差异位之后新的内容
+    上一版使用一个变量标记上次stepStack的长度进行判断消除和补充存在的问题
+    无法实现悔棋之后再下棋这种情况的修改
+    DOM补充渲染时创建fragment，避免多次appendChild
+  */
   changeModel(model, stepStack) {
+      if(this.model!=model){
+    let shortLength = stepStack.length>this.oldstepStack.length?this.oldstepStack.length:stepStack.length;
+    let nocatch = 0;
+    for(let i=0;i<shortLength;i++){
+        if(stepStack[i].x!=this.oldstepStack[i].x||stepStack[i].y!=this.oldstepStack[i].y||stepStack[i].steper!=this.oldstepStack[i].steper){
+            nocatch = i;
+            break;
+        }
+        else{
+          nocatch = shortLength;
+        }
+    }
+/*     console.log(this.oldstepStack);
+    console.log(stepStack);
+    console.log(nocatch);
+    console.log(shortLength); */
     if (model == "canvas" && model != this.model) {
       this.canvasElement.style.display = "block";
-      //悔棋切换的情况
-      if (stepStack.length < this.modelParseIn) {
-        for (let i = this.modelParseIn; i > stepStack.length; i--) {
-          this.withdraw(stepStack[i]);
-        }
-      } else {
-        for (let i = this.modelParseIn; i < stepStack.length; i++) {
+      for(let i=nocatch;i<this.oldstepStack.length;i++){
+        this.withdraw(this.oldstepStack[i]);
+      }
+      for(let i=nocatch;i<stepStack.length;i++){
           this.drawStep(stepStack[i]);
-        }
       }
       this.model = "canvas";
-      this.modelParseIn = stepStack.length;
       this.DOMBoard.style.display = "none";
     }
     if (model == "dom" && model != this.model) {
       this.DOMBoard.style.display = "block";
       let fragment = document.createDocumentFragment();
-      //悔棋切换
-      if (stepStack.length < this.modelParseIn) {
-        for (let i = this.modelParseIn; i > stepStack.length; i--) {
-          this.DOMwithdraw();
-        }
-      } else {
-        for (let i = this.modelParseIn; i < stepStack.length; i++) {
-          let chessman = document.createElement("div");
-          let x = stepStack[i].x * 40 + 5;
-          let y = stepStack[i].y * 40 + 5;
-          if (stepStack[i].steper == 1) {
-            chessman.className = "black";
-          } else {
-            chessman.className = "white";
-          }
-          chessman.style.transform = "translate(" + y + "px," + x + "px)";
-          fragment.appendChild(chessman);
-        }
+      for(let i=nocatch;i<this.oldstepStack.length;i++){
+        this.DOMwithdraw(this.oldstepStack[i]);
       }
-
+      for(let i=nocatch;i<stepStack.length;i++){
+        let chessman = document.createElement("div");
+        let x = stepStack[i].x * 40 + 5;
+        let y = stepStack[i].y * 40 + 5;
+        if (stepStack[i].steper == 1) {
+          chessman.className = "black";
+        } else {
+          chessman.className = "white";
+        }
+        chessman.style.transform = "translate(" + y + "px," + x + "px)";
+        fragment.appendChild(chessman);
+      }
       this.DOMBoard.appendChild(fragment);
       this.model = "dom";
-      this.modelParseIn = stepStack.length;
       this.canvasElement.style.display = "none";
+    }
+    //需要创建新的数组，只保存引用无法完成比较
+    this.oldstepStack = new Array (...stepStack);
     }
   }
   //左边信息栏显示，赢了显示谁赢了，下棋显示下一棋手，悔棋显示当前棋手
@@ -202,7 +214,7 @@ class DrawEvent {
       this.model = "updata";
       this.changeModel("canvas", stepStack);
       this.showInfo(step);
-      this.modelParseIn = 0;
+      this.oldstepStack = [];
     }
   }
 }
